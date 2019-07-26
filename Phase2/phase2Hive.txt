@@ -1,0 +1,83 @@
+--David Beck
+--CSC555
+--Project Phase 2
+--6/12/19
+
+-- Create tables & load data
+create table part (
+  p_partkey     int,
+  p_name        varchar(22),
+  p_mfgr        varchar(6),
+  p_category    varchar(7),
+  p_brand1      varchar(9),
+  p_color       varchar(11),
+  p_type        varchar(25),
+  p_size        int,
+  p_container   varchar(10)    
+) ROW FORMAT DELIMITED FIELDS 
+TERMINATED BY '|' STORED AS TEXTFILE;;
+
+create table customer (
+  c_custkey     int,
+  c_name        varchar(25),
+  c_address     varchar(25),
+  c_city        varchar(10),
+  c_nation      varchar(15),
+  c_region      varchar(12),
+  c_phone       varchar(15),
+  c_mktsegment  varchar(10)    
+) ROW FORMAT DELIMITED FIELDS 
+TERMINATED BY '|' STORED AS TEXTFILE;;
+
+create table lineorder (
+  lo_orderkey          int,
+  lo_linenumber        int,
+  lo_custkey           int,
+  lo_partkey           int,
+  lo_suppkey           int,
+  lo_orderdate         int,
+  lo_orderpriority     varchar(15),
+  lo_shippriority      varchar(1),
+  lo_quantity          int,
+  lo_extendedprice     int,
+  lo_ordertotalprice   int,
+  lo_discount          int,
+  lo_revenue           int,
+  lo_supplycost        int,
+  lo_tax               int,
+  lo_commitdate         int,
+  lo_shipmode          varchar(10)    
+) ROW FORMAT DELIMITED FIELDS 
+TERMINATED BY '|' STORED AS TEXTFILE;;
+
+LOAD DATA LOCAL INPATH '/home/ec2-user/part.tbl' 
+OVERWRITE INTO TABLE part;
+
+LOAD DATA LOCAL INPATH '/home/ec2-user/customer.tbl' 
+OVERWRITE INTO TABLE customer;
+
+LOAD DATA LOCAL INPATH '/home/ec2-user/lineorder.tbl' 
+OVERWRITE INTO TABLE lineorder;
+
+-- Part 1
+-- Swap column 1 & 2
+ALTER TABLE part CHANGE p_partkey p_partkey STRING AFTER p_name;
+
+INSERT OVERWRITE LOCAL DIRECTORY '/home/ec2-user/hive_part'
+ROW FORMAT DELIMITED
+FIELDS TERMINATED BY '~'
+STORED AS TEXTFILE
+SELECT * FROM part;
+
+-- to display
+-- cd ..
+-- cat hive_part/000000_0
+
+-- Part 2
+-- implemented exactly as shown in the assignment
+select c_nation, sum(lo_revenue)
+from customer, lineorder
+where lo_custkey = c_custkey
+  and c_region = 'AMERICA' 
+  and lo_discount BETWEEN 4 and 6 
+group by c_nation;

@@ -1,0 +1,7 @@
+center1 124 111 21
+center2 99 37 41
+center3 16 9 31
+center4 29 76 6
+center5 50 96 35
+center6 80 122 107
+center7	68 69 75
